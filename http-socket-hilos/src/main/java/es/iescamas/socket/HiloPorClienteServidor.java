@@ -77,7 +77,6 @@ public class HiloPorClienteServidor implements Runnable {
              BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.US_ASCII));
              OutputStream out = clientSocket.getOutputStream()) {
 
-            // 1) Leer la primera línea: "GET /ruta HTTP/1.1"
             String requestLine = br.readLine();
             if (requestLine == null || requestLine.isBlank()) return;
 
@@ -86,61 +85,70 @@ public class HiloPorClienteServidor implements Runnable {
                 int start = 4;
                 int end = requestLine.indexOf(' ', start);
                 if (end > start) 
-                	path = requestLine.substring(start, end);
+                    path = requestLine.substring(start, end);
             }
 
-            // 2) Favicon: servir el fichero real desde resources y salir
             if ("/favicon.ico".equals(path)) {
                 serveFavicon(out);
                 return;
             }
 
-            // --- LÓGICA MEJORA 1: Ruta dinámica /nombre/ ---
-            String mensajeBienvenida = "Servidor OK"; // Mensaje por defecto
-            if (path.startsWith("/nombre/")) {
-                // path.substring(8) extrae lo que haya después de "/nombre/"
-                mensajeBienvenida = "Hola " + path.substring(8);
+            // --- MEJORA 3: Lógica de Estado HTTP y Rutas ---
+            String status = "200 OK"; // Por defecto todo va bien
+            String tituloPrincipal = "Información de la Petición";
+            String mensajeCuerpo = "";
+
+            if (path.equals("/")) {
+                mensajeCuerpo = "Servidor Activo. Prueba la ruta <b>/nombre/TuNombre</b>";
+            } 
+            else if (path.startsWith("/nombre/")) {
+                mensajeCuerpo = "Hola " + path.substring(8); 
+            } 
+            else {
+                // MEJORA 3: Error 404 Real
+                status = "404 Not Found";
+                tituloPrincipal = "Error 404 - No Encontrado";
+                mensajeCuerpo = "Lo sentimos, la ruta <b>" + path + "</b> no existe.";
             }
 
-            // 3) Datos del cliente
             String clientIp = clientSocket.getInetAddress().getHostAddress();
-            int clientPort = clientSocket.getPort();
-            String remote = clientSocket.getRemoteSocketAddress().toString();
+            String fecha = new SimpleDateFormat("dd/MM/yy HH:mm:ss").format(new Date());
 
-            long time = System.currentTimeMillis();
-            String fecha = new SimpleDateFormat("dd/MM/yy HH:mm:ss").format(new Date(time));
-
-            // HTML modificado para mostrar el mensaje dinámico
             String body = "<html>"
-                    + "<head>"
-                    + "<link rel='icon' href='/favicon.ico'>"
-                    + "<title>Programación de Servicios y Procesos</title>"
-                    + "</head>"
-                    + "<body style='background-color: coral;'>"
-                    + "<h3 style='color:blue;'>" + mensajeBienvenida + "</h3>" // <--- CAMBIO AQUÍ
-                    + "<p>Path: " + path + "</p>"
-                    + "<p>Server: " + fecha + "</p>"
-                    + "<p>Hilo: " + Thread.currentThread().getName() + "</p>"
-                    + "<p>Cliente IP: " + clientIp + "</p>"
-                    + "<p>Cliente puerto: " + clientPort + "</p>"
-                    + "<p>Remote: " + remote + "</p>"
-                    + "</body></html>";
+                    + "<head><title>PSP - Monitor</title>"
+                    + "<style>"
+                    + "  body { font-family: sans-serif; background-color: #f0f2f5; color: #333; padding: 20px; }"
+                    + "  .container { background: #fff; border: 1px solid #ddd; padding: 20px; border-radius: 4px; max-width: 600px; margin: 0 auto; }"
+                    + "  h2 { border-bottom: 2px solid " + (status.equals("200 OK") ? "#3498db" : "#e74c3c") + "; color: " + (status.equals("200 OK") ? "#3498db" : "#e74c3c") + "; padding-bottom: 10px; }"
+                    + "  ul { list-style: none; padding: 0; }"
+                    + "  li { margin-bottom: 8px; border-bottom: 1px solid #eee; padding-bottom: 5px; }"
+                    + "  .tag { font-weight: bold; color: #555; width: 120px; display: inline-block; }"
+                    + "</style></head>"
+                    + "<body><div class='container'>"
+                    + "  <h2>" + tituloPrincipal + "</h2>"
+                    + "  <ul>"
+                    + "    <li><span class='tag'>Estado:</span> " + status + "</li>"
+                    + "    <li><span class='tag'>Resultado:</span> " + mensajeCuerpo + "</li>"
+                    + "    <li><span class='tag'>Ruta:</span> <code>" + path + "</code></li>"
+                    + "    <li><span class='tag'>Hilo:</span> " + Thread.currentThread().getName() + "</li>"
+                    + "    <li><span class='tag'>IP Cliente:</span> " + clientIp + "</li>"
+                    + "    <li><span class='tag'>Fecha:</span> " + fecha + "</li>"
+                    + "  </ul>"
+                    + "  <p style='font-size: 0.8em; text-align: right; color: #999;'>Práctica 4 - Servidor Concurrente</p>"
+                    + " </div></body></html>";
 
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
 
-            String headers =
-                    "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: text/html; charset=UTF-8\r\n" +
-                    "Content-Length: " + bodyBytes.length + "\r\n" +
-                    "Connection: close\r\n" +
-                    "\r\n";
+            String headers = "HTTP/1.1 " + status + "\r\n" +
+                             "Content-Type: text/html; charset=UTF-8\r\n" +
+                             "Content-Length: " + bodyBytes.length + "\r\n" +
+                             "Connection: close\r\n\r\n";
 
             out.write(headers.getBytes(StandardCharsets.US_ASCII));
             out.write(bodyBytes);
             out.flush();
 
-            // Log de consola
-            System.out.println("[" + Thread.currentThread().getName() + "] " + requestLine);
+            System.out.println("[" + Thread.currentThread().getName() + "] " + requestLine + " -> " + status);
         }
     }
 
