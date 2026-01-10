@@ -68,6 +68,9 @@ public class HiloPorClienteServidor implements Runnable {
     /**
      * Procesa la conexión de un cliente.
      */
+    /**
+     * Procesa la conexión de un cliente.
+     */
     private void processClientRequest(Socket clientSocket) throws IOException {
         try (clientSocket;
              InputStream in = clientSocket.getInputStream();
@@ -92,21 +95,29 @@ public class HiloPorClienteServidor implements Runnable {
                 return;
             }
 
+            // --- LÓGICA MEJORA 1: Ruta dinámica /nombre/ ---
+            String mensajeBienvenida = "Servidor OK"; // Mensaje por defecto
+            if (path.startsWith("/nombre/")) {
+                // path.substring(8) extrae lo que haya después de "/nombre/"
+                mensajeBienvenida = "Hola " + path.substring(8);
+            }
+
             // 3) Datos del cliente
             String clientIp = clientSocket.getInetAddress().getHostAddress();
-            int clientPort = clientSocket.getPort(); // puerto remoto del cliente
-            String remote = clientSocket.getRemoteSocketAddress().toString(); // /IP:PUERTO
+            int clientPort = clientSocket.getPort();
+            String remote = clientSocket.getRemoteSocketAddress().toString();
 
             long time = System.currentTimeMillis();
             String fecha = new SimpleDateFormat("dd/MM/yy HH:mm:ss").format(new Date(time));
 
+            // HTML modificado para mostrar el mensaje dinámico
             String body = "<html>"
                     + "<head>"
                     + "<link rel='icon' href='/favicon.ico'>"
                     + "<title>Programación de Servicios y Procesos</title>"
                     + "</head>"
                     + "<body style='background-color: coral;'>"
-                    + "<h3 style='color:blue;'>Servidor OK</h3>"
+                    + "<h3 style='color:blue;'>" + mensajeBienvenida + "</h3>" // <--- CAMBIO AQUÍ
                     + "<p>Path: " + path + "</p>"
                     + "<p>Server: " + fecha + "</p>"
                     + "<p>Hilo: " + Thread.currentThread().getName() + "</p>"
@@ -128,10 +139,8 @@ public class HiloPorClienteServidor implements Runnable {
             out.write(bodyBytes);
             out.flush();
 
-            // Log: ignorar favicon (ya se devuelve arriba) y registrar petición normal
+            // Log de consola
             System.out.println("[" + Thread.currentThread().getName() + "] " + requestLine);
-            System.out.println("[" + Thread.currentThread().getName() + "] Cliente: " + remote);
-            System.out.println("[" + Thread.currentThread().getName() + "] Petición procesada: " + fecha);
         }
     }
 
