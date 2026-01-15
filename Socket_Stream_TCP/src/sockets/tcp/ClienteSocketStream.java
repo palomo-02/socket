@@ -23,7 +23,8 @@ public class ClienteSocketStream {
 
             System.out.println("Enviando mensaje");
 
-            String mensaje = "mensaje desde el cliente";
+            // cambio la longitud del mensaje para ver los bytes 
+            String mensaje = "olaCaracola";
             os.write(mensaje.getBytes());
 
             System.out.println("Mensaje enviado");

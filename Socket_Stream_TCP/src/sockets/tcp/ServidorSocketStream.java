@@ -17,7 +17,7 @@ public class ServidorSocketStream {
 
             System.out.println("Realizando el bind");
 
-            //Se cambia de que solo escuche conexiones internas con localhost y pongo que escuche cualquier peticion 0.0.0.0
+            //Se cambia de que solo escuche conexiones internas con localhost y pongo que escuche cualquier peticion con 0.0.0.0
             InetSocketAddress addr = new InetSocketAddress("0.0.0.0", 5555);    
             serverSocket.bind(addr);
 
@@ -31,8 +31,23 @@ public class ServidorSocketStream {
             OutputStream os = newSocket.getOutputStream();
 
             byte[] mensaje = new byte[25];
-            is.read(mensaje);
+            
+            //almacenamos los bytes leidos 
+            int bytesLeidos = is.read(mensaje);
 
+            
+            if (bytesLeidos != -1) {
+                // Creo el String desde el índice 0 hasta bytesLeidos
+                // 
+            	//la basura que queda en el resto del array se ignora
+                String mensajeLimpio = new String(mensaje, 0, bytesLeidos);
+                
+                System.out.println("Mensaje recibido: " + mensajeLimpio);
+                System.out.println("Bytes reales leídos: " + bytesLeidos); 
+            }
+            
+            
+            
             System.out.println("Mensaje recibido: " + new String(mensaje));
 
             System.out.println("Cerrando el nuevo socket");
