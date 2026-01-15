@@ -17,7 +17,8 @@ public class ServidorSocketStream {
 
             System.out.println("Realizando el bind");
 
-            InetSocketAddress addr = new InetSocketAddress("localhost", 5555);
+            //Se cambia de que solo escuche conexiones internas con localhost y pongo que escuche cualquier peticion 0.0.0.0
+            InetSocketAddress addr = new InetSocketAddress("0.0.0.0", 5555);    
             serverSocket.bind(addr);
 
             System.out.println("Aceptando conexiones");

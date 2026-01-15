@@ -14,8 +14,8 @@ public class ClienteSocketStream {
             Socket clientSocket = new Socket();
 
             System.out.println("Estableciendo la conexión");
-
-            InetSocketAddress addr = new InetSocketAddress("localhost", 5555);
+            // Mi direccion IP es  192.168.1.67, la sustituyo por localHost
+            InetSocketAddress addr = new InetSocketAddress("192.168.1.67", 5555);
             clientSocket.connect(addr);
 
             InputStream is = clientSocket.getInputStream();

@@ -16,6 +16,7 @@ public class Main {
 		}catch(InterruptedException ex) {
 			System.err.print(ex);
 		}
+		
 		System.out.println("Stopping server");
 		server.stop();
 	}
