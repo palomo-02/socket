@@ -19,8 +19,13 @@ public class AppServerSocket
 	private static int numGen;
     public static void main( String[] args ) 
     {
+    	// ANTES:
     	//Generar número
-    	numGen = (new Random()).nextInt(10)+1;
+    	// numGen = (new Random()).nextInt(10)+1;
+
+    	// AHORA:
+    	numGen = (new Random()).nextInt(100)+1; // Del 1 al 100    	
+    	
     	
     	try {
     		ServerSocket srvSock = new ServerSocket(PORT);
