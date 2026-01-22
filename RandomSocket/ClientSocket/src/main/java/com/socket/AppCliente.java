@@ -20,7 +20,7 @@ public class AppCliente
     	
         try {
         	//conectamos con el servidor
-        	Socket socket = new Socket("localhost",PORT);
+        	Socket socket = new Socket("192.168.1.67",PORT);  
         	
         	//Para enviar datos al server
         	PrintWriter salida = new PrintWriter(socket.getOutputStream(), true);
