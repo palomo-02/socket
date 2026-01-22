@@ -48,6 +48,13 @@ public class AppServerSocket
     		//comprobamos si es el número mágico
     		while((datoRec = entrada.readLine())!= null) {
   
+    			// añado la opcion a apagar el server al escibir "EXIT"
+    			if (datoRec.equalsIgnoreCase("EXIT")) {
+    		        salida.println("Cerrando servidor...");
+    		        break; 
+    		    }
+    			
+    			
     			datoEnv = checkNumero(datoRec);
     			
     			//Retornamos al cliente el resultado 
