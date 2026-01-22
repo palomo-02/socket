@@ -19,8 +19,8 @@ public class AppCliente
     {
     	
         try {
-        	//conectamos con el servidor
-        	Socket socket = new Socket("192.168.1.67",PORT);  
+        	//conectamos con el servidor //cambio la ip a la de la mauina virtual
+        	Socket socket = new Socket("localhost",PORT);  
         	
         	//Para enviar datos al server
         	PrintWriter salida = new PrintWriter(socket.getOutputStream(), true);
