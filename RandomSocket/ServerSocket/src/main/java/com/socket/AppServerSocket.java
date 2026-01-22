@@ -46,8 +46,11 @@ public class AppServerSocket
     		
     		//leeremos todos los mensajes recibidos
     		//comprobamos si es el número mágico
+    		
+    		int intentos =0;
     		while((datoRec = entrada.readLine())!= null) {
   
+    			intentos++;
     			// añado la opcion a apagar el server al escibir "EXIT"
     			if (datoRec.equalsIgnoreCase("EXIT")) {
     		        salida.println("Cerrando servidor...");
@@ -80,12 +83,15 @@ public class AppServerSocket
 		try {
 			int numero = Integer.parseInt(datoRec);
 			
+		    
 			if(numero > numGen) {
 				return "<server>El número es mayor que el número mágico";
 			}else if(numero < numGen) {
 				return "<server>El número es menor que el número mágico";
 			}else {
 				return "<server>Ha adivinado el número";
+		        return "<server>Ha adivinado el número en " + intentos + " intentos!";
+
 			}
 			
 			
