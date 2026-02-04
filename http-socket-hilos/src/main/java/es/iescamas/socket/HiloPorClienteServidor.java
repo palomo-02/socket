@@ -14,6 +14,14 @@ import java.util.Date;
 /**
  * Servidor TCP que atiende clientes mediante un hilo por conexión.
  * Sirve HTML básico y un favicon desde src/main/resources/favicon.ico
+ * 
+ * @author José Manuel Palomo Zambrano
+ * @version 1.0
+ * @since 04/02/2026
+ * @apiNote Ejemplo de uso: http://localhost:9090/nombre/Palomo
+ * 
+ * 
+ * 
  */
 public class HiloPorClienteServidor implements Runnable {
 
@@ -27,8 +35,14 @@ public class HiloPorClienteServidor implements Runnable {
     protected boolean isStopped;
 
     /** Referencia al hilo que ejecuta run(). */
+   
     protected Thread runningThread = null;
 
+    
+    /**
+     * Constructor del servidor concurrente.
+     * * @param serverPort puerto en el que el servidor escuchará conexiones entrantes.
+     */
     public HiloPorClienteServidor(int serverPort) {
         this.serverPort = serverPort;
     }
@@ -66,10 +80,14 @@ public class HiloPorClienteServidor implements Runnable {
     }
 
     /**
-     * Procesa la conexión de un cliente.
-     */
-    /**
-     * Procesa la conexión de un cliente.
+     * Procesa la solicitud HTTP de un cliente conectado.
+     * * @param clientSocket el socket que representa la conexión con el cliente.
+     * @throws IOException si ocurre un error de entrada/salida durante la comunicación.
+     * @apiNote Ejemplos de rutas soportadas:
+     * <pre>
+     * /nombre/Palomo = Saludo personalizado.
+     * /ruta/desconocida = Error 404 Not Found.
+     * </pre>
      */
     private void processClientRequest(Socket clientSocket) throws IOException {
         try (clientSocket;
@@ -179,7 +197,12 @@ public class HiloPorClienteServidor implements Runnable {
             out.flush();
         }
     }
-
+    
+    /**
+     * Indica si el servidor está ea punto de pararse o ya se ha detenido.
+     * * @return true si el servidor se ha detenido y false en caso contrario.
+     */
+    
     private synchronized boolean isStopped() {
         return isStopped;
     }
